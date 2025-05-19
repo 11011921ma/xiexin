@@ -1,0 +1,67 @@
+<html>
+<head>
+    <title>管理信箱</title>
+</head>
+<body>
+    <div class="container">
+        <h1>📬 管理信件</h1>
+        <div id="login">
+            <input type="password" id="password" placeholder="输入管理员密码" />
+            <button onclick="checkPassword()">进入</button>
+        </div>
+        <div id="adminPanel" style="display:none;">
+            <div id="letters"></div>
+        </div>
+    </div>
+
+    <script>
+        const ADMIN_PASSWORD = "123456";  // 管理员密码
+
+        // 校验管理员密码
+        function checkPassword() {
+            const pwd = document.getElementById("password").value;
+            if (pwd === ADMIN_PASSWORD) {
+                document.getElementById("login").style.display = "none";
+                document.getElementById("adminPanel").style.display = "block";
+                loadLetters();  // 加载信件
+            } else {
+                alert("密码错误！");
+            }
+        }
+
+        // 加载信件
+        function loadLetters() {
+            const letters = JSON.parse(localStorage.getItem('letters') || '[]');
+            const box = document.getElementById("letters");
+            box.innerHTML = "";
+            letters.forEach((letter, index) => {
+                // 解码回复内容
+                const decodedReply = letter.reply ? decodeURIComponent(letter.reply) : "等待回复...";
+
+                box.innerHTML += `
+                    <div class="letter">
+                        <p><strong>📝 信件 ${index + 1}</strong> (${letter.time})</p>
+                        <p>${letter.message}</p>
+                        <p><strong>回复：</strong> ${decodedReply}</p>
+                        <textarea id="reply${index}" placeholder="写一段回复...">${decodedReply}</textarea>
+                        <button onclick="saveReply(${index})">保存回复</button>
+                        <hr />
+                    </div>
+                `;
+            });
+        }
+
+        // 保存回复
+        function saveReply(index) {
+            const letters = JSON.parse(localStorage.getItem('letters') || '[]');
+            const replyText = document.getElementById(`reply${index}`).value;
+
+            // 编码回复内容以避免特殊字符导致问题
+            letters[index].reply = encodeURIComponent(replyText);
+
+            localStorage.setItem('letters', JSON.stringify(letters));
+            alert("回复已保存！");
+        }
+    </script>
+</body>
+</html>

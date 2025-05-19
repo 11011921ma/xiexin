@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Anonymous Letter Box</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f8f8f8;
+      color: #333;
+      max-width: 700px;
+      margin: 60px auto;
+      padding: 30px;
+      line-height: 1.6;
+    }
+
+    h1 {
+      font-weight: normal;
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+
+    p.description {
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 220px;
+      font-size: 16px;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      resize: vertical;
+      background: white;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background: #333;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #000;
+    }
+
+    #status {
+      margin-top: 15px;
+      color: #28a745;
+    }
+
+    #corner-img {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 80px;
+      border-radius: 8px;
+      opacity: 0.9;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+
+  <h1 id="title">Welcome</h1>
+  <p class="description" id="desc">...</p>
+
+  <textarea id="message" placeholder="Write it here. Whatever it is."></textarea>
+  <br />
+  <button onclick="submitLetter()">Send</button>
+
+  <p id="status"></p>
+
+  <img src="OIP.jpg" alt="mood" id="corner-img" />
+
+  <script>
+    // ✨ A-D 文案列表
+    const messages = [
+      {
+        title: "This is your space to wish",
+        desc: "You are anonymous. No one will judge you. Speak your heart, whisper your wishes, or just let something go. I’ll read it all quietly."
+      },
+      {
+        title: "Make a wish, or just speak",
+        desc: "You don’t have to explain. You’re not being watched. Whatever's on your heart — write it down, and maybe that’s enough."
+      },
+      {
+        title: "Write without fear",
+        desc: "No one knows who you are. There are no rules here. Say what you’ve been holding in. A wish. A hope. A thought you’ve never shared."
+      },
+      {
+        title: "You are unseen, but heard",
+        desc: "This is a place to say what you can’t say elsewhere. No name, no expectations. Just write. I’ll be here, quietly reading."
+      }
+    ];
+
+    // 🎲 随机显示其中一组
+    const chosen = messages[Math.floor(Math.random() * messages.length)];
+    document.getElementById('title').textContent = chosen.title;
+    document.getElementById('desc').textContent = chosen.desc;
+
+    // ✉️ 提交信件
+    function submitLetter() {
+      const msg = document.getElementById('message').value.trim();
+      if (!msg) {
+        alert("Write something first. Even a little is okay.");
+        return;
+      }
+
+      fetch('/api/letters', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: msg })
+      })
+      .then(res => res.json())
+      .then(() => {
+        document.getElementById('status').textContent = "Your letter has been received 🕊️";
+        document.getElementById('message').value = "";
+      })
+      .catch(() => {
+        alert("Something went wrong. Please try again later.");
+      });
+    }
+  </script>
+
+</body>
+</html>
